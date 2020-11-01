@@ -1,129 +1,296 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+import speech_recognition as sr 
+import pywhatkit as kit
+import pyttsx3
+import wikipedia
+import time
+from textblob import TextBlob
+import pyjokes
+import pygame
+from covid import Covid
 
-# C extensions
-*.so
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+r = sr.Recognizer()
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
+engine = pyttsx3.init()
 
-# Translations
-*.mo
-*.pot
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
 
-# Flask stuff:
-instance/
-.webassets-cache
+def scareing():
+    pygame.init()
+    windows = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+    pygame.mixer.init()
+    pygame.mixer.music.load('ratsasan.mp3')
+    pygame.mixer.music.play()
+    time.sleep(5)
+    pygame.mixer.music.load('scary.mp3')
+    pygame.mixer.music.play()
+    time.sleep(1)
+    image = pygame.image.load('halloween.jpg')
+    windows.blit(image,(0,0))
+    pygame.display.update()
+    time.sleep(4)
 
-# Scrapy stuff:
-.scrapy
 
-# Sphinx documentation
-docs/_build/
+while True :
 
-# PyBuilder
-target/
+    with sr.Microphone() as source:
+        print("hi sir how may i help you:")
+        engine.say("hi sir how may i help you")
+        engine.runAndWait()
+        audio = r.record(source,duration=5)
+    try:
+        text = r.recognize_google(audio)
+        orginal = r.recognize_google(audio)
+        print("You said : {}".format(text))
+        engine.say("You said : {}".format(text))
+        engine.runAndWait()
 
-# Jupyter Notebook
-.ipynb_checkpoints
 
-# IPython
-profile_default/
-ipython_config.py
 
-# pyenv
-.python-version
+           ## SPELLING CORRECTION
+        lis = text.split()
+        crr_lst = []
+        nw = []
+        for word in lis :
+            crr_lst.append(TextBlob(word))
+        for word in crr_lst:
+            rt = (word.correct())
+            nw.append(rt)
+            print(nw)
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
-__pypackages__/
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
+            #### OPENING GOOGLE
+            if "Google" in nw:
+                if "open" in nw:
+                        print("what you want to search")
+                        engine.say("what you want to search")
+                        engine.runAndWait()
+                        with sr.Microphone() as source:
+                            audio = r.record(source,duration=5)
+                            text = r.recognize_google(audio)
+                            kit.search(text)
 
-# SageMath parsed files
-*.sage.py
 
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+                ### PLAYING A SONG
+            if "play" in nw:
+                if "a" in nw:
+                    if "song" in nw:
+                        print("playing Undipova full song from yotube")
+                        engine.say("playing Undipova full song from yotube")
+                        engine.runAndWait()
+                        kit.playonyt('Undipova full video')
 
-# Spyder project settings
-.spyderproject
-.spyproject
 
-# Rope project settings
-.ropeproject
+           ## WIKIPEDIA
+        if "Wikipedia" in nw:
+            if "open" in nw:
+               print("what you want to search")
+               engine.say("what you want to search")
+               engine.runAndWait()
+               with sr.Microphone() as source:
+                   audio = r.record(source,duration=5)
+                   text = r.recognize_google(audio)
+                   result = wikipedia.summary(text, sentences = 2)
+                   engine.say(result)
+                   engine.runAndWait()
 
-# mkdocs documentation
-/site
+                ## WHATS APP
+        if "WhatsApp" in nw:
+            if "message" in nw:
+                engine.say("to whome shouild i send")
+                engine.runAndWait()
+                with sr.Microphone() as source:
+                    audio = r.record(source,duration=5)
+                    text = r.recognize_google(audio)
+                    prs = text
+                    engine.say("plese say the message ")
+                    engine.runAndWait()
+                with sr.Microphone() as source:
+                    audio = r.record(source,duration=5)
+                    text = r.recognize_google(audio)
+                    msg = text
+                    print(prs)
+                    if prs == "Pradeep":
+                        hr = 22
+                        min = 11
+                        kit.sendwhatmsg("+919246293531",msg,hr, min)
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+                    ## GIVING DELAY
+        if text == "wait":
+            engine.say("okk sir ")
+            engine.runAndWait()
+            print("okk sir")
+            time.sleep(10)
 
-# Pyre type checker
-.pyre/
+
+          ## REMINDER
+        if "remind" in nw:
+            if "me" in nw:
+                print("okk sir whats the reminder for")
+                engine.say("okk sir whats the reminder for")
+                engine.runAndWait()
+                with sr.Microphone() as source:
+                    audio = r.record(source,duration=5)
+                    text = r.recognize_google(audio)
+                    rm = text
+                    engine.say("ok sir in how much time shouild reminde you pls mention time in minutes or houres or seconds ")
+                    engine.runAndWait()
+                    with sr.Microphone() as source:
+                        audio = r.record(source,duration=5)
+                        text = r.recognize_google(audio)
+                        t = text.split()
+
+                        ## SECONDS
+                        if "seconds" in text:
+                            engine.say("plese say how many seconds ")
+                            engine.runAndWait()
+                            print("plese say how many seconds ")
+                            with sr.Microphone() as source:
+                                audio = r.record(source,duration=5)
+                                text = r.recognize_google(audio)
+                                tm = int(text)
+                                print(4)
+                                time.sleep(tm)
+                                engine.say("sir your reminder",rm)
+                                engine.runAndWait()
+                                time.sleep(1)
+                                engine.say("sir your reminder",rm)
+                                engine.runAndWait()
+                                time.sleep(1)
+                                engine.say(rm)
+                                engine.runAndWait(1)
+
+                        if "minutes" in text:
+                            engine.say("plese say how many minutes ")
+                            engine.runAndWait()
+                            print("plese say how many seconds ")
+                            with sr.Microphone() as source:
+                                audio = r.record(source,duration=5)
+                                text = r.recognize_google(audio)
+                                tm = int(text)
+                                tm = tm*60
+                                print(tm)
+                                time.sleep(tm)
+                                engine.say("sir your reminder",rm)
+                                engine.runAndWait()
+                                time.sleep(1)
+                                engine.say("sir your reminder",rm)
+                                engine.runAndWait()
+                                time.sleep(1)
+                                engine.say(rm)
+                                engine.runAndWait(1)
+        if "calculated" in nw:
+            if "open" in nw:
+                engine.say("plese say what you want to calculate")
+                engine.runAndWait()
+                with sr.Microphone() as source:
+                    audio = r.record(source,duration=5)
+                    text = r.recognize_google(audio)
+                    print(text)
+                    kit.search(text)
+
+
+
+        ## JOKE
+        if "tell" in nw:
+            if "me" in nw:
+                if "joke" in nw:
+                    print(pyjokes.get_joke())
+                    engine.say(pyjokes.get_joke())
+                    engine.runAndWait()
+
+
+        if "can" in nw:
+            if "scare" in nw:
+                if "me" in nw:
+                    engine.say("haa haa yaa i can scare you are you sure say yes     if    yes ")
+                    engine.runAndWait()
+                    print("yaa i can scare you are you sure say yes if yes ")
+                    with sr.Microphone() as source:
+                        audio = r.record(source,duration=5)
+                        text = r.recognize_google(audio)
+                        if text == "yes":
+                            scareing()
+                            break
+
+          ##PAYING YOUR SONG
+        if "play" in nw:
+            kit.playonyt(text)
+
+
+
+           ## KNOWING A PERSON
+        if "who" in nw:
+            if "is" in nw:
+                result = wikipedia.summary(orginal, sentences = 2)
+                engine.say(result)
+                engine.runAndWait()
+
+
+            ##MENINGES
+        if "what" in nw:
+            if "is" in nw:
+                result = wikipedia.summary(text, sentences = 2)
+                engine.say(result)
+                engine.runAndWait()
+
+
+        if "Corona" in nw:
+            if "cases" in nw:
+                intent = 0
+                caseslist = []
+                # initializing
+                covid = Covid()
+                activecases = []
+                print("Total active cases in world:", covid.get_total_active_cases())
+                activecases.append("Total active cases in world:")
+                activecases.append(covid.get_total_active_cases())
+                engine.say(activecases)
+                engine.runAndWait()
+                activecases.clear()
+
+                print("Total recovered cases in world:", covid.get_total_recovered())
+                activecases.append("Total recovered cases in world:")
+                activecases.append(covid.get_total_recovered())
+                engine.say(activecases)
+                engine.runAndWait()
+                activecases.clear()
+
+                print("Total deaths in world:", covid.get_total_deaths())
+                activecases.append("Total deaths in world:")
+                activecases.append( covid.get_total_deaths())
+                engine.say(activecases)
+                engine.runAndWait()
+                activecases.clear()
+
+
+                print("which country corona cases you want know")
+                engine.say("which country corona cases you want know")
+                engine.runAndWait()
+                with sr.Microphone() as source:
+                    audio = r.record(source,duration=5)
+                    text = r.recognize_google(audio)
+                    print(text)
+                    cases = covid.get_status_by_country_name(text)
+                    caseslist.clear()
+                    for x in cases:
+                        caseslist.append(x)
+                        caseslist.append(cases[x])
+                        print(caseslist)
+                        intent = intent+1
+                        caseslist.pop(0)
+
+                        if x == "latitude":
+                            print(x, ":", cases[x])
+                            engine.say(caseslist)
+                            engine.runAndWait()
+                            break
+
+    except:
+            print("Sorry could not recognize what you said")
+            time.sleep(5)
+
+
