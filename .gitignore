@@ -1,296 +1,167 @@
-import speech_recognition as sr 
-import pywhatkit as kit
 import pyttsx3
+import pywhatkit as kit
+import webbrowser
+import smtplib
+import random
+import speech_recognition as sr
 import wikipedia
-import time
-from textblob import TextBlob
-import pyjokes
-import pygame
-from covid import Covid
+import datetime
+import wolframalpha
+import os
+import sys
 
+engine = pyttsx3.init('sapi5')
 
+#client = wolframalpha.Client('Your_App_ID')
 
-r = sr.Recognizer()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[len(voices)-1].id)
 
+def speak(audio):
+    print('Computer: ' + audio)
+    engine.say(audio)
+    engine.runAndWait()
 
-engine = pyttsx3.init()
+def greetMe():
+    currentH = int(datetime.datetime.now().hour)
+    if currentH >= 0 and currentH < 12:
+        speak('Good Morning sir!')
 
+    if currentH >= 12 and currentH < 18:
+        speak('Good Afternoon sir!')
 
+    if currentH >= 18 and currentH !=0:
+        speak('Good Evening sir!')
 
-def scareing():
-    pygame.init()
-    windows = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
-    pygame.mixer.init()
-    pygame.mixer.music.load('ratsasan.mp3')
-    pygame.mixer.music.play()
-    time.sleep(5)
-    pygame.mixer.music.load('scary.mp3')
-    pygame.mixer.music.play()
-    time.sleep(1)
-    image = pygame.image.load('halloween.jpg')
-    windows.blit(image,(0,0))
-    pygame.display.update()
-    time.sleep(4)
+def myCommand():
 
-
-while True :
-
+    r = sr.Recognizer()
     with sr.Microphone() as source:
-        print("hi sir how may i help you:")
-        engine.say("hi sir how may i help you")
-        engine.runAndWait()
-        audio = r.record(source,duration=5)
+        print("recognizeing...")
+        r.pause_threshold =  1
+        audio = r.listen(source)
     try:
-        text = r.recognize_google(audio)
-        orginal = r.recognize_google(audio)
-        print("You said : {}".format(text))
-        engine.say("You said : {}".format(text))
-        engine.runAndWait()
+        query = r.recognize_google(audio, language='en-in')
+        print('User: ' + query + '\n')
+
+    except sr.UnknownValueError:
+        speak('sorry sir can you please reapet it or els try by typeing')
+        query = str(input('Command: '))
+
+    return query
+greetMe()
+speak('this is your assistent selena how may i help you sir')
+if __name__ == '__main__':
+    while True:
+
+        query = myCommand();
+        query = query.lower()
+
+        if 'open youtube' in query:
+            speak('okay')
+            webbrowser.open('www.youtube.com')
+
+        elif 'open google' in query:
+            speak('okay')
+            webbrowser.open('www.google.co.in')
+
+        elif 'open gmail' in query:
+            speak('okay')
+            webbrowser.open('www.gmail.com')
+
+        elif "what\'s up" in query or 'how are you' in query:
+            stMsgs = ['Just doing my thing!', 'I am fine!', 'Nice!', 'I am nice and full of energy']
+            speak(random.choice(stMsgs))
+
+        elif 'email' in query:
+            speak('Who is the recipient? ')
+            recipient = myCommand()
+
+            if 'me' in recipient:
+                try:
+                    speak('What should I say? ')
+                    content = myCommand()
+
+                    server = smtplib.SMTP('smtp.gmail.com', 587)
+                    server.ehlo()
+                    server.starttls()
+                    server.login("Your_Username", 'Your_Password')
+                    server.sendmail('Your_Username', "Recipient_Username", content)
+                    server.close()
+                    speak('Email sent!')
+
+                except:
+                    speak('Sorry Sir! I am unable to send your message at this moment!')
 
 
+        elif 'nothing' in query or 'abort' in query or 'stop' in query:
+            speak('okay')
+            speak('Bye Sir, have a good day.')
+            sys.exit()
 
-           ## SPELLING CORRECTION
-        lis = text.split()
-        crr_lst = []
-        nw = []
-        for word in lis :
-            crr_lst.append(TextBlob(word))
-        for word in crr_lst:
-            rt = (word.correct())
-            nw.append(rt)
-            print(nw)
+        elif 'the date' in query:
+            year = str(datetime.datetime.now().year)
+            month = str(datetime.datetime.now().month)
+            date = str(datetime.datetime.now().day)
+            speak("the current Date is")
+            speak(date)
+            speak(month)
+            speak(year)
+            speak('have a nice day sir')
 
+        elif 'the time' in query:
+            strTime = datetime.datetime.now().strftime("%I:%M:%S")
+            speak(f"Sir, the time is {strTime}")
 
+        elif 'how to make' in query:
+            kit.playonyt(query)
+            speak('got it')
 
-            #### OPENING GOOGLE
-            if "Google" in nw:
-                if "open" in nw:
-                        print("what you want to search")
-                        engine.say("what you want to search")
-                        engine.runAndWait()
-                        with sr.Microphone() as source:
-                            audio = r.record(source,duration=5)
-                            text = r.recognize_google(audio)
-                            kit.search(text)
+        elif  'who invited you' in query:
+            speak('i was developed by sir pradeep he is my founder')
 
+        elif 'the date' in query:
+            year = str(datetime.datetime.now().year)
+            month = str(datetime.datetime.now().month)
+            date = str(datetime.datetime.now().day)
+            speak("the current Date is")
+            speak(date)
+            speak(month)
+            speak(year)
 
-                ### PLAYING A SONG
-            if "play" in nw:
-                if "a" in nw:
-                    if "song" in nw:
-                        print("playing Undipova full song from yotube")
-                        engine.say("playing Undipova full song from yotube")
-                        engine.runAndWait()
-                        kit.playonyt('Undipova full video')
+        elif 'the time' in query:
+            strTime = datetime.datetime.now().strftime("%I:%M:%S")
+            speak(f"Sir, the time is {strTime}")
 
+        elif 'hello' in query:
+            speak('Hello Sir')
 
-           ## WIKIPEDIA
-        if "Wikipedia" in nw:
-            if "open" in nw:
-               print("what you want to search")
-               engine.say("what you want to search")
-               engine.runAndWait()
-               with sr.Microphone() as source:
-                   audio = r.record(source,duration=5)
-                   text = r.recognize_google(audio)
-                   result = wikipedia.summary(text, sentences = 2)
-                   engine.say(result)
-                   engine.runAndWait()
+        elif 'bye' in query:
+            speak('Bye Sir, have a good day.')
+            sys.exit()
+        elif 'play the song' in query:
+            query = query.replace('play the song','song')
+            kit.playonyt(query)
 
-                ## WHATS APP
-        if "WhatsApp" in nw:
-            if "message" in nw:
-                engine.say("to whome shouild i send")
-                engine.runAndWait()
-                with sr.Microphone() as source:
-                    audio = r.record(source,duration=5)
-                    text = r.recognize_google(audio)
-                    prs = text
-                    engine.say("plese say the message ")
-                    engine.runAndWait()
-                with sr.Microphone() as source:
-                    audio = r.record(source,duration=5)
-                    text = r.recognize_google(audio)
-                    msg = text
-                    print(prs)
-                    if prs == "Pradeep":
-                        hr = 22
-                        min = 11
-                        kit.sendwhatmsg("+919246293531",msg,hr, min)
+        elif 'play music' in query:
+            songs = ['//www.youtube.com/watch?v=BBAyRBTfsOU', 'https://www.youtube.com/watch?v=Pm77L5Loazc', 'https://www.youtube.com/watch?v=LPsyTf6EK5U','https://www.youtube.com/watch?v=kJQP7kiw5Fk']
+            randomsong = (random.choice(songs))
+            webbrowser.open(randomsong)
+            speak('Okay sir')
 
-                    ## GIVING DELAY
-        if text == "wait":
-            engine.say("okk sir ")
-            engine.runAndWait()
-            print("okk sir")
-            time.sleep(10)
+            speak('Okay, here is your music! Enjoy!')
 
 
-          ## REMINDER
-        if "remind" in nw:
-            if "me" in nw:
-                print("okk sir whats the reminder for")
-                engine.say("okk sir whats the reminder for")
-                engine.runAndWait()
-                with sr.Microphone() as source:
-                    audio = r.record(source,duration=5)
-                    text = r.recognize_google(audio)
-                    rm = text
-                    engine.say("ok sir in how much time shouild reminde you pls mention time in minutes or houres or seconds ")
-                    engine.runAndWait()
-                    with sr.Microphone() as source:
-                        audio = r.record(source,duration=5)
-                        text = r.recognize_google(audio)
-                        t = text.split()
+        else:
+            query = query
+            speak('Searching...')
+            try:
+                results = wikipedia.summary(query, sentences=2)
+                speak('Got it.')
+                speak('WIKIPEDIA says - ')
+                speak(results)
 
-                        ## SECONDS
-                        if "seconds" in text:
-                            engine.say("plese say how many seconds ")
-                            engine.runAndWait()
-                            print("plese say how many seconds ")
-                            with sr.Microphone() as source:
-                                audio = r.record(source,duration=5)
-                                text = r.recognize_google(audio)
-                                tm = int(text)
-                                print(4)
-                                time.sleep(tm)
-                                engine.say("sir your reminder",rm)
-                                engine.runAndWait()
-                                time.sleep(1)
-                                engine.say("sir your reminder",rm)
-                                engine.runAndWait()
-                                time.sleep(1)
-                                engine.say(rm)
-                                engine.runAndWait(1)
+            except:
+                    webbrowser.open('www.google.com')
 
-                        if "minutes" in text:
-                            engine.say("plese say how many minutes ")
-                            engine.runAndWait()
-                            print("plese say how many seconds ")
-                            with sr.Microphone() as source:
-                                audio = r.record(source,duration=5)
-                                text = r.recognize_google(audio)
-                                tm = int(text)
-                                tm = tm*60
-                                print(tm)
-                                time.sleep(tm)
-                                engine.say("sir your reminder",rm)
-                                engine.runAndWait()
-                                time.sleep(1)
-                                engine.say("sir your reminder",rm)
-                                engine.runAndWait()
-                                time.sleep(1)
-                                engine.say(rm)
-                                engine.runAndWait(1)
-        if "calculated" in nw:
-            if "open" in nw:
-                engine.say("plese say what you want to calculate")
-                engine.runAndWait()
-                with sr.Microphone() as source:
-                    audio = r.record(source,duration=5)
-                    text = r.recognize_google(audio)
-                    print(text)
-                    kit.search(text)
-
-
-
-        ## JOKE
-        if "tell" in nw:
-            if "me" in nw:
-                if "joke" in nw:
-                    print(pyjokes.get_joke())
-                    engine.say(pyjokes.get_joke())
-                    engine.runAndWait()
-
-
-        if "can" in nw:
-            if "scare" in nw:
-                if "me" in nw:
-                    engine.say("haa haa yaa i can scare you are you sure say yes     if    yes ")
-                    engine.runAndWait()
-                    print("yaa i can scare you are you sure say yes if yes ")
-                    with sr.Microphone() as source:
-                        audio = r.record(source,duration=5)
-                        text = r.recognize_google(audio)
-                        if text == "yes":
-                            scareing()
-                            break
-
-          ##PAYING YOUR SONG
-        if "play" in nw:
-            kit.playonyt(text)
-
-
-
-           ## KNOWING A PERSON
-        if "who" in nw:
-            if "is" in nw:
-                result = wikipedia.summary(orginal, sentences = 2)
-                engine.say(result)
-                engine.runAndWait()
-
-
-            ##MENINGES
-        if "what" in nw:
-            if "is" in nw:
-                result = wikipedia.summary(text, sentences = 2)
-                engine.say(result)
-                engine.runAndWait()
-
-
-        if "Corona" in nw:
-            if "cases" in nw:
-                intent = 0
-                caseslist = []
-                # initializing
-                covid = Covid()
-                activecases = []
-                print("Total active cases in world:", covid.get_total_active_cases())
-                activecases.append("Total active cases in world:")
-                activecases.append(covid.get_total_active_cases())
-                engine.say(activecases)
-                engine.runAndWait()
-                activecases.clear()
-
-                print("Total recovered cases in world:", covid.get_total_recovered())
-                activecases.append("Total recovered cases in world:")
-                activecases.append(covid.get_total_recovered())
-                engine.say(activecases)
-                engine.runAndWait()
-                activecases.clear()
-
-                print("Total deaths in world:", covid.get_total_deaths())
-                activecases.append("Total deaths in world:")
-                activecases.append( covid.get_total_deaths())
-                engine.say(activecases)
-                engine.runAndWait()
-                activecases.clear()
-
-
-                print("which country corona cases you want know")
-                engine.say("which country corona cases you want know")
-                engine.runAndWait()
-                with sr.Microphone() as source:
-                    audio = r.record(source,duration=5)
-                    text = r.recognize_google(audio)
-                    print(text)
-                    cases = covid.get_status_by_country_name(text)
-                    caseslist.clear()
-                    for x in cases:
-                        caseslist.append(x)
-                        caseslist.append(cases[x])
-                        print(caseslist)
-                        intent = intent+1
-                        caseslist.pop(0)
-
-                        if x == "latitude":
-                            print(x, ":", cases[x])
-                            engine.say(caseslist)
-                            engine.runAndWait()
-                            break
-
-    except:
-            print("Sorry could not recognize what you said")
-            time.sleep(5)
-
-
+        speak('plese say the next command sir')
