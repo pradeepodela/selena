@@ -1,8 +1,11 @@
 ##### BOT ######
 import pyttsx3
 import speech_recognition as sr
+import pandas as pd
 
-iteams = []
+
+
+
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[len(voices)-1].id)
@@ -34,11 +37,14 @@ def shope():
     for x in pizzahurtmenu:
         speak(x)
 def add(iteamss):
+    iteams = []
+    newiteams = []
     iteamss = iteamss.split()
     if 'to' in iteamss:
         x = iteamss.replace("to","2")
         iteams.append(x)
-        print(iteams)
+        #print(iteams)
+        print(pd.to_datetime(iteams, errors='ignore'))
 
 
 
